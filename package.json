@@ -1,6 +1,7 @@
 {
   "name": "ai-chatbot",
-  "version": "3.1.0",
+  "version": "1.0.0"
+  "author": "preetam-90 <preetamkumar8873@gmail.com>",,
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
