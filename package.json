@@ -1,8 +1,8 @@
 {
   "name": "ai-chatbot",
-  "version": "1.0.0"
-  "author": "preetam-90 <preetamkumar8873@gmail.com>",,
+  "version": "1.0.0",
   "private": true,
+  "author": "preetam-90 <preetamkumar8873@gmail.com>",
   "scripts": {
     "dev": "next dev --turbo",
     "build": "tsx lib/db/migrate && next build",
