@@ -17,23 +17,31 @@ import { CheckCircleFillIcon, ChevronDownIcon } from './icons';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
 import type { Session } from 'next-auth';
 
-export function ModelSelector({
+// Static placeholder component for initial server render
+function StaticModelSelector({ className }: { className?: string }) {
+  return (
+    <Button
+      variant="outline"
+      className={cn("md:px-2 md:h-[34px] opacity-0", className)}
+    >
+      <span className="invisible">Loading</span>
+    </Button>
+  );
+}
+
+// Interactive component for client-side render
+function InteractiveModelSelector({
   session,
   selectedModelId,
   className,
 }: {
   session: Session;
   selectedModelId: string;
-} & React.ComponentProps<typeof Button>) {
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [optimisticModelId, setOptimisticModelId] =
     useOptimistic(selectedModelId);
-  const [mounted, setMounted] = useState(false);
-
-  // Use useEffect to handle client-side rendering
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const userType = session.user.type;
   const { availableChatModelIds } = entitlementsByUserType[userType];
@@ -50,18 +58,6 @@ export function ModelSelector({
     [optimisticModelId, availableChatModels],
   );
 
-  // Don't render anything until client-side to avoid hydration mismatch
-  if (!mounted) {
-    return (
-      <Button
-        variant="outline"
-        className={cn("md:px-2 md:h-[34px]", className)}
-      >
-        Loading...
-      </Button>
-    );
-  }
-
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger
@@ -75,7 +71,6 @@ export function ModelSelector({
           data-testid="model-selector"
           variant="outline"
           className="md:px-2 md:h-[34px]"
-          key={`model-selector-${optimisticModelId}`}
         >
           {selectedChatModel?.name || "Select Model"}
           <ChevronDownIcon />
@@ -120,5 +115,36 @@ export function ModelSelector({
         })}
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+// Main component that switches between static and interactive versions
+export function ModelSelector({
+  session,
+  selectedModelId,
+  className,
+}: {
+  session: Session;
+  selectedModelId: string;
+} & React.ComponentProps<typeof Button>) {
+  const [mounted, setMounted] = useState(false);
+
+  // Use useEffect to handle client-side rendering
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // Return static placeholder during server render and initial client render
+    return <StaticModelSelector className={className} />;
+  }
+
+  // Once mounted on client, render the interactive version
+  return (
+    <InteractiveModelSelector
+      session={session}
+      selectedModelId={selectedModelId}
+      className={className}
+    />
   );
 }
