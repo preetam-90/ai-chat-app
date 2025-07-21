@@ -1,6 +1,6 @@
 'use client';
 
-import { startTransition, useMemo, useOptimistic, useState } from 'react';
+import { startTransition, useMemo, useOptimistic, useState, useEffect } from 'react';
 
 import { saveChatModelAsCookie } from '@/app/(chat)/actions';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,12 @@ export function ModelSelector({
   const [open, setOpen] = useState(false);
   const [optimisticModelId, setOptimisticModelId] =
     useOptimistic(selectedModelId);
+  const [mounted, setMounted] = useState(false);
+
+  // Use useEffect to handle client-side rendering
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const userType = session.user.type;
   const { availableChatModelIds } = entitlementsByUserType[userType];
@@ -44,6 +50,18 @@ export function ModelSelector({
     [optimisticModelId, availableChatModels],
   );
 
+  // Don't render anything until client-side to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <Button
+        variant="outline"
+        className={cn("md:px-2 md:h-[34px]", className)}
+      >
+        Loading...
+      </Button>
+    );
+  }
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger
@@ -57,8 +75,9 @@ export function ModelSelector({
           data-testid="model-selector"
           variant="outline"
           className="md:px-2 md:h-[34px]"
+          key={`model-selector-${optimisticModelId}`}
         >
-          {selectedChatModel?.name}
+          {selectedChatModel?.name || "Select Model"}
           <ChevronDownIcon />
         </Button>
       </DropdownMenuTrigger>
