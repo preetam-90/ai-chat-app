@@ -93,6 +93,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@opentelemetry/instrumentation": "^0.203.0",
+    "@opentelemetry/sdk-logs": "^0.203.0",
     "@playwright/test": "^1.50.1",
     "@tailwindcss/typography": "^0.5.15",
     "@types/d3-scale": "^4.0.8",
